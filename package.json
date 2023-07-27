@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "devStart": "nodemon server.js",
+    "devStart2": "nodemon server.js",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
