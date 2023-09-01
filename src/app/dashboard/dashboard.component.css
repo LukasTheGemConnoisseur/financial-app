@@ -1,0 +1,23 @@
+#firstStock {
+  margin-left: 180px;
+  margin-top: 50px;
+}
+.positive {
+  color: green;
+}
+
+.negative {
+  color: red;
+}
+
+#stocks {
+  border-top: 2px solid gray;
+  border-bottom: 2px solid gray;
+}
+
+.stocksColumn {
+  border-bottom: 2px solid lightgrey;
+}
+.chart-container {
+  width: 750px;
+}

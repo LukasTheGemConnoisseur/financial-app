@@ -1,19 +1,36 @@
-<!--Do I need this defer src?-->
-<script defer src="dashboard.component.ts"></script>
 <div class="container text-center">
   <div class="row">
-    <div class="col">
-      Stocks
+    <div class="col" id="stocks">
+      <h3 class="stocksColumn">Stocks</h3>
       <div>
         <div class="cardStocks" id="firstStock" style="width: 18rem">
-          <img src="..." class="card-img-top" alt="..." />
           <div class="card-body">
-            <h5 class="card-title">{{stocksData?.quoteType?.shortName}}</h5>
-            <p class="card-text">{{ stocksData?.price?.regularMarketPrice?.fmt }}</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
+            <h5 class="card-title">{{ stocksData?.quoteType?.shortName }}</h5>
+            <div class="card-text">
+              Current Price: ${{ stocksData?.financialData?.currentPrice?.fmt }}
+              <br />
+              <div
+                [ngClass]="{
+                  positive: stocksData?.price?.regularMarketChange?.fmt > 0,
+                  negative: stocksData?.price?.regularMarketChange?.fmt < 0
+                }"
+              >
+                Today: ${{ stocksData?.price?.regularMarketChange?.fmt }} ({{
+                  stocksData?.price?.regularMarketChangePercent?.fmt
+                }})
+              </div>
+              Market Cap:
+              {{ stocksData?.price?.marketCap?.fmt }}
+              <br />
+              Volume:
+              {{ stocksData?.summaryDetail?.volume?.fmt }}
+            </div>
           </div>
         </div>
       </div>
+    </div>
+    <div class="chart-container">
+      <canvas id="MyChart">{{ chart }}</canvas>
     </div>
     <div class="col">Column</div>
   </div>

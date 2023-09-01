@@ -11,6 +11,8 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
 import { HomeComponent } from './home/home.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { HttpClientModule } from '@angular/common/http';
+import { NgChartsModule } from 'ng2-charts';
+import { LineChartComponent } from './line-chart/line-chart.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +24,7 @@ import { HttpClientModule } from '@angular/common/http';
     PageNotFoundComponent,
     HomeComponent,
     DashboardComponent,
+    LineChartComponent,
   ],
   imports: [
     BrowserModule,
@@ -33,6 +36,7 @@ import { HttpClientModule } from '@angular/common/http';
       { path: '', redirectTo: '/home', pathMatch: 'full' },
       { path: '**', component: PageNotFoundComponent },
     ]),
+    NgChartsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
