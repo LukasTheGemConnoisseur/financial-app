@@ -1,10 +1,10 @@
 <div class="container text-center">
   <div class="row">
+    <h3 class="stocksColumn">Stocks</h3>
     <div class="col" id="stocks">
-      <h3 class="stocksColumn">Stocks</h3>
       <div>
-        <div class="cardStocks" id="firstStock" style="width: 18rem">
-          <div class="card-body">
+        <div class="cardStocks" id="firstStock">
+          <div class="card-body card-content">
             <h5 class="card-title">{{ stocksData?.quoteType?.shortName }}</h5>
             <div class="card-text">
               Current Price: ${{ stocksData?.financialData?.currentPrice?.fmt }}
@@ -29,9 +29,100 @@
         </div>
       </div>
     </div>
-    <div class="chart-container">
-      <canvas id="MyChart">{{ chart }}</canvas>
+    <div class="col" id="stocksChart">
+      <div class="btn-group">
+        <button
+          type="button"
+          class="btn btn-outline-dark btn-sm"
+          id="1dButton"
+          (click)="updateChart('1d')"
+        >
+          1d
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-dark btn-sm"
+          id="5dButton"
+          (click)="updateChart('5d')"
+        >
+          5d
+        </button>
+        <button
+          type="button"
+          class="btn active btn-outline-dark btn-sm"
+          id="1moButton"
+          (click)="updateChart('1mo')"
+        >
+          1mo
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-dark btn-sm"
+          id="3moButton"
+          (click)="updateChart('3mo')"
+        >
+          3mo
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-dark btn-sm"
+          id="6moButton"
+          (click)="updateChart('6mo')"
+        >
+          6mo
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-dark btn-sm"
+          id="1yButton"
+          (click)="updateChart('1y')"
+        >
+          1y
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-dark btn-sm"
+          id="2yButton"
+          (click)="updateChart('2y')"
+        >
+          2y
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-dark btn-sm"
+          id="5yButton"
+          (click)="updateChart('5y')"
+        >
+          5y
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-dark btn-sm"
+          id="10yButton"
+          (click)="updateChart('10y')"
+        >
+          10y
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-dark btn-sm"
+          id="ytdButton"
+          (click)="updateChart('ytd')"
+        >
+          ytd
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-dark btn-sm"
+          id="maxButton"
+          (click)="updateChart('max')"
+        >
+          max
+        </button>
+      </div>
+      <div class="chart-container">
+        <canvas id="MyChart">{{ chart }}</canvas>
+      </div>
     </div>
-    <div class="col">Column</div>
   </div>
 </div>
