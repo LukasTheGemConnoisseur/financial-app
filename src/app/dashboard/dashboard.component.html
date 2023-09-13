@@ -30,95 +30,118 @@
       </div>
     </div>
     <div class="col" id="stocksChart">
-      <div class="btn-group">
-        <button
-          type="button"
-          class="btn btn-outline-dark btn-sm"
-          id="1dButton"
-          (click)="updateChart('1d')"
-        >
+      <div class="btn-group" data-toggle="buttons">
+        <label class="btn btn-outline-dark btn-sm">
+          <input
+            type="radio"
+            name="options"
+            id="1dButton"
+            autocomplete="off"
+            (click)="updateChart('1d')"
+          />
           1d
-        </button>
-        <button
-          type="button"
-          class="btn btn-outline-dark btn-sm"
-          id="5dButton"
-          (click)="updateChart('5d')"
-        >
+        </label>
+        <label class="btn btn-outline-dark btn-sm">
+          <input
+            type="radio"
+            name="options"
+            id="5dButton"
+            autocomplete="off"
+            (click)="updateChart('5d')"
+          />
           5d
-        </button>
-        <button
-          type="button"
-          class="btn active btn-outline-dark btn-sm"
-          id="1moButton"
-          (click)="updateChart('1mo')"
-        >
+        </label>
+        <label class="btn btn-outline-dark btn-sm">
+          <input
+            type="radio"
+            name="options"
+            id="1moButton"
+            autocomplete="off"
+            (click)="updateChart('1mo')"
+            checked
+          />
           1mo
-        </button>
-        <button
-          type="button"
-          class="btn btn-outline-dark btn-sm"
-          id="3moButton"
-          (click)="updateChart('3mo')"
-        >
+        </label>
+        <label class="btn btn-outline-dark btn-sm">
+          <input
+            type="radio"
+            name="options"
+            id="3moButton"
+            autocomplete="off"
+            (click)="updateChart('3mo')"
+          />
           3mo
-        </button>
-        <button
-          type="button"
-          class="btn btn-outline-dark btn-sm"
-          id="6moButton"
-          (click)="updateChart('6mo')"
-        >
+        </label>
+        <label class="btn btn-outline-dark btn-sm">
+          <input
+            type="radio"
+            name="options"
+            id="6moButton"
+            autocomplete="off"
+            (click)="updateChart('6mo')"
+          />
           6mo
-        </button>
-        <button
-          type="button"
-          class="btn btn-outline-dark btn-sm"
-          id="1yButton"
-          (click)="updateChart('1y')"
-        >
+        </label>
+        <label class="btn btn-outline-dark btn-sm">
+          <input
+            type="radio"
+            name="options"
+            id="1yButton"
+            autocomplete="off"
+            (click)="updateChart('1y')"
+          />
           1y
-        </button>
-        <button
-          type="button"
-          class="btn btn-outline-dark btn-sm"
-          id="2yButton"
-          (click)="updateChart('2y')"
-        >
+        </label>
+        <label class="btn btn-outline-dark btn-sm">
+          <input
+            type="radio"
+            name="options"
+            id="2yButton"
+            autocomplete="off"
+            (click)="updateChart('2y')"
+          />
           2y
-        </button>
-        <button
-          type="button"
-          class="btn btn-outline-dark btn-sm"
-          id="5yButton"
-          (click)="updateChart('5y')"
-        >
+        </label>
+        <label class="btn btn-outline-dark btn-sm">
+          <input
+            type="radio"
+            name="options"
+            id="5yButton"
+            autocomplete="off"
+            (click)="updateChart('5y')"
+          />
           5y
-        </button>
-        <button
-          type="button"
-          class="btn btn-outline-dark btn-sm"
-          id="10yButton"
-          (click)="updateChart('10y')"
-        >
+        </label>
+        <label class="btn btn-outline-dark btn-sm">
+          <input
+            type="radio"
+            name="options"
+            id="10yButton"
+            autocomplete="off"
+            (click)="updateChart('10y')"
+          />
           10y
-        </button>
-        <button
-          type="button"
-          class="btn btn-outline-dark btn-sm"
-          id="ytdButton"
-          (click)="updateChart('ytd')"
-        >
+        </label>
+        <label class="btn btn-outline-dark btn-sm">
+          <input
+            type="radio"
+            name="options"
+            id="ytdButton"
+            autocomplete="off"
+            (click)="updateChart('ytd')"
+          />
           ytd
-        </button>
-        <button
-          type="button"
-          class="btn btn-outline-dark btn-sm"
-          id="maxButton"
-          (click)="updateChart('max')"
-        >
+        </label>
+        <label class="btn btn-outline-dark btn-sm">
+          <input
+            type="radio"
+            name="options"
+            id="maxButton"
+            autocomplete="off"
+            (click)="updateChart('max')"
+          />
           max
-        </button>
+        </label>
       </div>
       <div class="chart-container">
         <canvas id="MyChart">{{ chart }}</canvas>
