@@ -9,11 +9,11 @@ import axios from 'axios';
 import Chart from 'chart.js/auto';
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css'],
+  selector: 'app-dashboard-market',
+  templateUrl: './dashboard-market.component.html',
+  styleUrls: ['./dashboard-market.component.css'],
 })
-export class DashboardComponent implements OnInit, AfterViewInit {
+export class DashboardMarketComponent implements OnInit, AfterViewInit {
   stocksData: any; // Declare a property to hold the API data
   public chart: any; // Stores chart data
   stocksDataChart: any; // Stores stock chart API data
@@ -21,7 +21,6 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   stocksDataChartPricesRounded: any; // Stores rounded stock chart prices
   stocksDataChartTimes: any; // Stores stock chart times
   stocksDataChartTimesConverted: any; // Stores converted stock chart times
-  stocksDataChartTimesConvertedDays: any; // stores converted stock chart time days
   stocksDataChartTimesConvertedHours: any; // stores converted stock chart time hours
   stocksDataChartTimesConvertedHoursandDays: any; // stores converted stock chart time hours and days
 
@@ -40,7 +39,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.chart.data.labels = this?.stocksDataChartTimesConvertedHours;
         break;
       case '5d':
-        this.chart.data.labels = this?.stocksDataChartTimesConvertedDays;
+        this.chart.data.labels = this?.stocksDataChartTimesConverted;
         tooltipTitles = this.stocksDataChartTimesConvertedHoursandDays;
         break;
 
@@ -80,81 +79,94 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.chart.update();
   }
 
+  stockPricesData(rawPrices: any[]) {
+    rawPrices
+      .map((price: number | null) => {
+        if (typeof price === 'number') {
+          return price.toFixed(2); // Convert valid numbers to strings with two decimal places
+        }
+        return 'N/A'; // Handle non-numeric values
+      })
+      .filter((price: string) => price !== 'N/A'); // Remove non-numeric values
+    return rawPrices;
+  }
+
+  stockTimesData(times: any[]) {
+    const convertedTime = times.map((timeDate: number) =>
+      new Date(timeDate * 1000).toLocaleDateString('en-US')
+    );
+    return convertedTime;
+  }
+
+  chartApiCallGeneral(range: string, interval: string) {
+    const call = {
+      method: 'GET',
+      url: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v3/get-chart',
+      params: {
+        interval: interval,
+        symbol: 'TSLA',
+        range: range,
+        region: 'US',
+        includePrePost: 'false',
+        useYfid: 'true',
+        includeAdjustedClose: 'true',
+        events: 'capitalGain,div,split',
+      },
+      headers: {
+        'X-RapidAPI-Key': '362ec0421cmshfba1d04496e3fbbp12c938jsn16f3092359ee',
+        'X-RapidAPI-Host': 'apidojo-yahoo-finance-v1.p.rapidapi.com',
+      },
+    };
+    return call;
+  }
+
   updateChart(range: string) {
     // Call the API with the selected time range (e.g., '1mo', '3mo', '1yr')
     // Update the 'symbol', 'range', and other parameters accordingly based on the button clicked
 
     if (range == '2y' || range == '5y' || range == '10y' || range == 'max') {
-      const options = {
-        method: 'GET',
-        url: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v3/get-chart',
-        params: {
-          interval: '1wk',
-          symbol: 'TSLA',
-          range: range, // Use the selected time range here
-          region: 'US',
-          includePrePost: 'false',
-          useYfid: 'true',
-          includeAdjustedClose: 'true',
-          events: 'capitalGain,div,split',
-        },
-        headers: {
-          'X-RapidAPI-Key':
-            '362ec0421cmshfba1d04496e3fbbp12c938jsn16f3092359ee',
-          'X-RapidAPI-Host': 'apidojo-yahoo-finance-v1.p.rapidapi.com',
-        },
-      };
+      const interval = '1wk';
+      const options = this.chartApiCallGeneral(range, interval);
 
       axios
         .request(options)
         .then((response) => {
-          this.stocksDataChart = response.data;
-          console.log(response.data);
+          if (
+            response.data &&
+            response.data.chart &&
+            response.data.chart.result.length > 0
+          ) {
+            this.stocksDataChart = response.data;
 
-          // Update other chart-related data (prices, times) here as you did in realTimeDataChart()
+            this.stocksDataChartPrices =
+              this.stocksDataChart.chart.result[0].indicators.adjclose[0].adjclose;
 
-          this.stocksDataChartPrices =
-            this.stocksDataChart.chart.result[0].indicators.adjclose[0].adjclose;
-          this.stocksDataChartPricesRounded = this.stocksDataChartPrices.map(
-            (price: number) => price.toFixed(2)
-          );
+            const rawPrices = this.stocksDataChartPrices;
 
-          this.stocksDataChartTimes =
-            this.stocksDataChart.chart.result[0].timestamp;
-          this.stocksDataChartTimesConverted = this.stocksDataChartTimes.map(
-            (timeDate: number) =>
-              new Date(timeDate * 1000).toLocaleDateString('en-US')
-          );
+            this.stocksDataChartPricesRounded = this.stockPricesData(rawPrices);
 
-          // Recreate the chart with the updated data
-          this.createChart();
+            this.stocksDataChartTimes =
+              this.stocksDataChart.chart.result[0].timestamp;
 
-          // Update the new chart with the data
-          this.updateChartData(range);
+            this.stocksDataChartTimesConverted = this.stockTimesData(
+              this.stocksDataChartTimes
+            );
+
+            // Recreate the chart with the updated data
+            this.createChart();
+
+            // Update the new chart with the data
+            this.updateChartData(range);
+          } else {
+            console.error('Invalid API response data');
+          }
         })
         .catch((error) => {
           console.error(error);
         });
     } else if (range == '5d') {
-      const options = {
-        method: 'GET',
-        url: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v3/get-chart',
-        params: {
-          interval: '30m',
-          symbol: 'TSLA',
-          range: range, // Use the selected time range here
-          region: 'US',
-          includePrePost: 'false',
-          useYfid: 'true',
-          includeAdjustedClose: 'true',
-          events: 'capitalGain,div,split',
-        },
-        headers: {
-          'X-RapidAPI-Key':
-            '362ec0421cmshfba1d04496e3fbbp12c938jsn16f3092359ee',
-          'X-RapidAPI-Host': 'apidojo-yahoo-finance-v1.p.rapidapi.com',
-        },
-      };
+      const interval = '30m';
+      const options = this.chartApiCallGeneral(range, interval);
 
       axios
         .request(options)
@@ -166,22 +178,17 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
           this.stocksDataChartPrices =
             this.stocksDataChart.chart.result[0].indicators.quote[0].close;
-          this.stocksDataChartPricesRounded = this.stocksDataChartPrices.map(
-            (price: number) => price.toFixed(2)
-          );
+
+          const rawPrices = this.stocksDataChartPrices;
+
+          this.stocksDataChartPricesRounded = this.stockPricesData(rawPrices);
 
           this.stocksDataChartTimes =
             this.stocksDataChart.chart.result[0].timestamp;
-          // console.log(this.stocksDataChartTimes);
-          this.stocksDataChartTimesConverted = this.stocksDataChartTimes.map(
-            (timeDate: number) =>
-              new Date(timeDate * 1000).toLocaleString('en-US')
+
+          this.stocksDataChartTimesConverted = this.stockTimesData(
+            this.stocksDataChartTimes
           );
-          this.stocksDataChartTimesConvertedDays =
-            this.stocksDataChartTimes.map((timeDate: number) =>
-              new Date(timeDate * 1000).toLocaleDateString('en-US')
-            );
-          // console.log(this.stocksDataChartTimesConvertedDays);
 
           this.stocksDataChartTimesConvertedHoursandDays =
             this.stocksDataChartTimes.map((timeDate: number) => {
@@ -194,7 +201,6 @@ export class DashboardComponent implements OnInit, AfterViewInit {
               const formattedTime = `${dateDays} ${hours}:${minutes}`;
               return formattedTime;
             });
-          // console.log(this.stocksDataChartTimesConvertedHoursandDays);
 
           // Recreate the chart with the updated data
           this.createChart();
@@ -206,25 +212,9 @@ export class DashboardComponent implements OnInit, AfterViewInit {
           console.error(error);
         });
     } else if (range == '1d') {
-      const options = {
-        method: 'GET',
-        url: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v3/get-chart',
-        params: {
-          interval: '5m',
-          symbol: 'TSLA',
-          range: range, // Use the selected time range here
-          region: 'US',
-          includePrePost: 'false',
-          useYfid: 'true',
-          includeAdjustedClose: 'true',
-          events: 'capitalGain,div,split',
-        },
-        headers: {
-          'X-RapidAPI-Key':
-            '362ec0421cmshfba1d04496e3fbbp12c938jsn16f3092359ee',
-          'X-RapidAPI-Host': 'apidojo-yahoo-finance-v1.p.rapidapi.com',
-        },
-      };
+      const interval = '5m';
+
+      const options = this.chartApiCallGeneral(range, interval);
 
       axios
         .request(options)
@@ -236,18 +226,17 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
           this.stocksDataChartPrices =
             this.stocksDataChart.chart.result[0].indicators.quote[0].close;
-          this.stocksDataChartPricesRounded = this.stocksDataChartPrices.map(
-            (price: number) => price.toFixed(2)
-          );
+
+          const rawPrices = this.stocksDataChartPrices;
+
+          this.stocksDataChartPricesRounded = this.stockPricesData(rawPrices);
 
           this.stocksDataChartTimes =
             this.stocksDataChart.chart.result[0].timestamp;
-          // console.log(this.stocksDataChartTimes);
-          this.stocksDataChartTimesConverted = this.stocksDataChartTimes.map(
-            (timeDate: number) =>
-              new Date(timeDate * 1000).toLocaleString('en-US')
+
+          this.stocksDataChartTimesConverted = this.stockTimesData(
+            this.stocksDataChartTimes
           );
-          // console.log(this.stocksDataChartTimesConverted);
 
           this.stocksDataChartTimesConvertedHours =
             this.stocksDataChartTimes.map((timeDate: number) => {
@@ -269,25 +258,9 @@ export class DashboardComponent implements OnInit, AfterViewInit {
           console.error(error);
         });
     } else {
-      const options = {
-        method: 'GET',
-        url: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v3/get-chart',
-        params: {
-          interval: '1d',
-          symbol: 'TSLA',
-          range: range, // Use the selected time range here
-          region: 'US',
-          includePrePost: 'false',
-          useYfid: 'true',
-          includeAdjustedClose: 'true',
-          events: 'capitalGain,div,split',
-        },
-        headers: {
-          'X-RapidAPI-Key':
-            '362ec0421cmshfba1d04496e3fbbp12c938jsn16f3092359ee',
-          'X-RapidAPI-Host': 'apidojo-yahoo-finance-v1.p.rapidapi.com',
-        },
-      };
+      const interval = '1d';
+
+      const options = this.chartApiCallGeneral(range, interval);
 
       axios
         .request(options)
@@ -299,15 +272,16 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
           this.stocksDataChartPrices =
             this.stocksDataChart.chart.result[0].indicators.adjclose[0].adjclose;
-          this.stocksDataChartPricesRounded = this.stocksDataChartPrices.map(
-            (price: number) => price.toFixed(2)
-          );
+
+          const rawPrices = this.stocksDataChartPrices;
+
+          this.stocksDataChartPricesRounded = this.stockPricesData(rawPrices);
 
           this.stocksDataChartTimes =
             this.stocksDataChart.chart.result[0].timestamp;
-          this.stocksDataChartTimesConverted = this.stocksDataChartTimes.map(
-            (timeDate: number) =>
-              new Date(timeDate * 1000).toLocaleDateString('en-US')
+
+          this.stocksDataChartTimesConverted = this.stockTimesData(
+            this.stocksDataChartTimes
           );
 
           // Recreate the chart with the updated data

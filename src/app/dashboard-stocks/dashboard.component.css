@@ -1,0 +1,30 @@
+.positive {
+  color: green;
+}
+
+.negative {
+  color: red;
+}
+
+#stocks {
+  border-top: 2px solid gray;
+  border-bottom: 2px solid gray;
+}
+
+.stocksColumn {
+  text-align: center;
+}
+#stocksChart {
+  border-top: 2px solid gray;
+  padding-top: 5px;
+}
+.chart-container {
+  width: 100%; /* Use 100% width to fill the available space */
+  max-width: 750px; /* Set a maximum width */
+  margin: 0 auto; /* Center horizontally */
+  border-bottom: 2px solid gray;
+}
+.card-content {
+  text-align: center; /* Center text horizontally */
+  margin-top: 60px; /* Center content vertically */
+}
