@@ -34,31 +34,28 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   updateChartData(range: string) {
     // Update the chart's data and options
+    let tooltipTitles = [0];
     switch (range) {
       case '1d':
         this.chart.data.labels = this?.stocksDataChartTimesConvertedHours;
         break;
       case '5d':
         this.chart.data.labels = this?.stocksDataChartTimesConvertedDays;
+        tooltipTitles = this.stocksDataChartTimesConvertedHoursandDays;
         break;
+
       default:
         this.chart.data.labels = this.stocksDataChartTimesConverted;
     }
     this.chart.data.datasets[0].data = this.stocksDataChartPricesRounded;
-
-    const tooltipTitles = this.stocksDataChartTimesConvertedHoursandDays;
-    console.log(tooltipTitles);
 
     this.chart.options = {
       aspectRatio: 2.5,
       tooltips: {
         callbacks: {
           title: function (tooltipItems: any[]) {
-            // Get the index of the hovered item
             const index = tooltipItems[0].index;
-
             const title = tooltipTitles[index];
-
             return title;
           },
         },
