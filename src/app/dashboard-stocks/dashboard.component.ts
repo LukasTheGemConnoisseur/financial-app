@@ -345,7 +345,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       .request(options)
       .then((response) => {
         this.stocksDataChart = response.data;
-        console.log(response.data);
+        // console.log(response.data);
 
         this.stocksDataChartPrices =
           this.stocksDataChart.chart.result[0].indicators.adjclose[0].adjclose;
@@ -374,7 +374,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       this.chart.destroy(); // Destroys the existing chart if it exists
     }
 
-    this.chart = new Chart('MyChart', {
+    this.chart = new Chart('MyChartTwo', {
       type: 'line', //this denotes the type of chart
 
       data: {

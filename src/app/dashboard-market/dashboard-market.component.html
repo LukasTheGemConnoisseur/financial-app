@@ -1,35 +1,39 @@
 <div class="container text-center">
   <div class="row">
     <h3 class="marketColumn">Market</h3>
-    <div class="col" id="stocks">
+    <div class="col" id="market">
       <div>
-        <div class="cardStocks" id="firstStock">
+        <div class="cardStocks" id="firstMarket">
           <div class="card-body card-content">
-            <h5 class="card-title">{{ stocksData?.quoteType?.shortName }}</h5>
+            <h5 class="card-title">
+              {{ marketData?.quoteResponse.result[0].shortName }}
+            </h5>
             <div class="card-text">
-              Current Price: ${{ stocksData?.financialData?.currentPrice?.fmt }}
+              Current Price: ${{
+                marketData?.quoteResponse.result[0].regularMarketPrice
+              }}
               <br />
               <div
                 [ngClass]="{
-                  positive: stocksData?.price?.regularMarketChange?.fmt > 0,
-                  negative: stocksData?.price?.regularMarketChange?.fmt < 0
+                  positive: marketPriceChange > 0,
+                  negative: marketPriceChange < 0
                 }"
               >
-                Today: ${{ stocksData?.price?.regularMarketChange?.fmt }} ({{
-                  stocksData?.price?.regularMarketChangePercent?.fmt
-                }})
+                Today: ${{ marketPriceChange }} ({{
+                  marketPriceChangePercent
+                }}%)
               </div>
               Market Cap:
-              {{ stocksData?.price?.marketCap?.fmt }}
+              {{ marketCap }}
               <br />
               Volume:
-              {{ stocksData?.summaryDetail?.volume?.fmt }}
+              {{ marketVolume }}
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="col" id="stocksChart">
+    <div class="col" id="marketChart">
       <div class="btn-group" data-toggle="buttons">
         <label class="btn btn-outline-dark btn-sm">
           <input
@@ -44,7 +48,7 @@
         <label class="btn btn-outline-dark btn-sm">
           <input
             type="radio"
-            name="options"
+            name="optionsMarket"
             id="5dButton"
             autocomplete="off"
             (click)="updateChart('5d')"
@@ -54,28 +58,18 @@
         <label class="btn btn-outline-dark btn-sm">
           <input
             type="radio"
-            name="options"
-            id="1moButton"
-            autocomplete="off"
-            (click)="updateChart('1mo')"
-            checked
-          />
-          1mo
-        </label>
-        <label class="btn btn-outline-dark btn-sm">
-          <input
-            type="radio"
-            name="options"
+            name="optionsMarket"
             id="3moButton"
             autocomplete="off"
             (click)="updateChart('3mo')"
+            checked
           />
           3mo
         </label>
         <label class="btn btn-outline-dark btn-sm">
           <input
             type="radio"
-            name="options"
+            name="optionsMarket"
             id="6moButton"
             autocomplete="off"
             (click)="updateChart('6mo')"
@@ -85,7 +79,7 @@
         <label class="btn btn-outline-dark btn-sm">
           <input
             type="radio"
-            name="options"
+            name="optionsMarket"
             id="1yButton"
             autocomplete="off"
             (click)="updateChart('1y')"
@@ -95,17 +89,7 @@
         <label class="btn btn-outline-dark btn-sm">
           <input
             type="radio"
-            name="options"
-            id="2yButton"
-            autocomplete="off"
-            (click)="updateChart('2y')"
-          />
-          2y
-        </label>
-        <label class="btn btn-outline-dark btn-sm">
-          <input
-            type="radio"
-            name="options"
+            name="optionsMarket"
             id="5yButton"
             autocomplete="off"
             (click)="updateChart('5y')"
@@ -115,27 +99,7 @@
         <label class="btn btn-outline-dark btn-sm">
           <input
             type="radio"
-            name="options"
-            id="10yButton"
-            autocomplete="off"
-            (click)="updateChart('10y')"
-          />
-          10y
-        </label>
-        <label class="btn btn-outline-dark btn-sm">
-          <input
-            type="radio"
-            name="options"
-            id="ytdButton"
-            autocomplete="off"
-            (click)="updateChart('ytd')"
-          />
-          ytd
-        </label>
-        <label class="btn btn-outline-dark btn-sm">
-          <input
-            type="radio"
-            name="options"
+            name="optionsMarket"
             id="maxButton"
             autocomplete="off"
             (click)="updateChart('max')"

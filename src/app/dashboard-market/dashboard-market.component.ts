@@ -14,15 +14,19 @@ import Chart from 'chart.js/auto';
   styleUrls: ['./dashboard-market.component.css'],
 })
 export class DashboardMarketComponent implements OnInit, AfterViewInit {
-  stocksData: any; // Declare a property to hold the API data
+  marketData: any; // Declare a property to hold the API data
+  marketPriceChange: any; // Stores market price change
+  marketPriceChangePercent: any; // Stores market price change percent
+  marketCap: any; // stores market cap
+  marketVolume: any; // stores market volume
   public chart: any; // Stores chart data
-  stocksDataChart: any; // Stores stock chart API data
-  stocksDataChartPrices: any; // Stores stock chart prices
-  stocksDataChartPricesRounded: any; // Stores rounded stock chart prices
-  stocksDataChartTimes: any; // Stores stock chart times
-  stocksDataChartTimesConverted: any; // Stores converted stock chart times
-  stocksDataChartTimesConvertedHours: any; // stores converted stock chart time hours
-  stocksDataChartTimesConvertedHoursandDays: any; // stores converted stock chart time hours and days
+  marketDataChart: any; // Stores market chart API data
+  marketDataChartPrices: any; // Stores market chart prices
+  marketDataChartPricesRounded: any; // Stores rounded market chart prices
+  marketDataChartTimes: any; // Stores market chart times
+  marketDataChartTimesConverted: any; // Stores converted market chart times
+  marketDataChartTimesConvertedHours: any; // stores converted market chart time hours
+  marketDataChartTimesConvertedHoursandDays: any; // stores converted market chart time hours and days
 
   ngOnInit(): void {
     this.realTimeData();
@@ -36,17 +40,17 @@ export class DashboardMarketComponent implements OnInit, AfterViewInit {
     let tooltipTitles = [0];
     switch (range) {
       case '1d':
-        this.chart.data.labels = this?.stocksDataChartTimesConvertedHours;
+        this.chart.data.labels = this?.marketDataChartTimesConvertedHours;
         break;
       case '5d':
-        this.chart.data.labels = this?.stocksDataChartTimesConverted;
-        tooltipTitles = this.stocksDataChartTimesConvertedHoursandDays;
+        this.chart.data.labels = this?.marketDataChartTimesConverted;
+        tooltipTitles = this.marketDataChartTimesConvertedHoursandDays;
         break;
 
       default:
-        this.chart.data.labels = this.stocksDataChartTimesConverted;
+        this.chart.data.labels = this.marketDataChartTimesConverted;
     }
-    this.chart.data.datasets[0].data = this.stocksDataChartPricesRounded;
+    this.chart.data.datasets[0].data = this.marketDataChartPricesRounded;
 
     this.chart.options = {
       aspectRatio: 2.5,
@@ -79,7 +83,7 @@ export class DashboardMarketComponent implements OnInit, AfterViewInit {
     this.chart.update();
   }
 
-  stockPricesData(rawPrices: any[]) {
+  marketPricesData(rawPrices: any[]) {
     rawPrices
       .map((price: number | null) => {
         if (typeof price === 'number') {
@@ -91,7 +95,7 @@ export class DashboardMarketComponent implements OnInit, AfterViewInit {
     return rawPrices;
   }
 
-  stockTimesData(times: any[]) {
+  marketTimesData(times: any[]) {
     const convertedTime = times.map((timeDate: number) =>
       new Date(timeDate * 1000).toLocaleDateString('en-US')
     );
@@ -101,16 +105,12 @@ export class DashboardMarketComponent implements OnInit, AfterViewInit {
   chartApiCallGeneral(range: string, interval: string) {
     const call = {
       method: 'GET',
-      url: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v3/get-chart',
+      url: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/get-charts',
       params: {
+        symbol: 'AAPL',
         interval: interval,
-        symbol: 'TSLA',
         range: range,
         region: 'US',
-        includePrePost: 'false',
-        useYfid: 'true',
-        includeAdjustedClose: 'true',
-        events: 'capitalGain,div,split',
       },
       headers: {
         'X-RapidAPI-Key': '362ec0421cmshfba1d04496e3fbbp12c938jsn16f3092359ee',
@@ -121,10 +121,10 @@ export class DashboardMarketComponent implements OnInit, AfterViewInit {
   }
 
   updateChart(range: string) {
-    // Call the API with the selected time range (e.g., '1mo', '3mo', '1yr')
+    // Call the API with the selected time range (e.g., '3mo', '1yr')
     // Update the 'symbol', 'range', and other parameters accordingly based on the button clicked
 
-    if (range == '2y' || range == '5y' || range == '10y' || range == 'max') {
+    if (range == '5y' || range == 'max') {
       const interval = '1wk';
       const options = this.chartApiCallGeneral(range, interval);
 
@@ -136,20 +136,21 @@ export class DashboardMarketComponent implements OnInit, AfterViewInit {
             response.data.chart &&
             response.data.chart.result.length > 0
           ) {
-            this.stocksDataChart = response.data;
+            this.marketDataChart = response.data;
 
-            this.stocksDataChartPrices =
-              this.stocksDataChart.chart.result[0].indicators.adjclose[0].adjclose;
+            this.marketDataChartPrices =
+              this.marketDataChart.chart.result[0].indicators.quote[0].close;
 
-            const rawPrices = this.stocksDataChartPrices;
+            const rawPrices = this.marketDataChartPrices;
 
-            this.stocksDataChartPricesRounded = this.stockPricesData(rawPrices);
+            this.marketDataChartPricesRounded =
+              this.marketPricesData(rawPrices);
 
-            this.stocksDataChartTimes =
-              this.stocksDataChart.chart.result[0].timestamp;
+            this.marketDataChartTimes =
+              this.marketDataChart.chart.result[0].timestamp;
 
-            this.stocksDataChartTimesConverted = this.stockTimesData(
-              this.stocksDataChartTimes
+            this.marketDataChartTimesConverted = this.marketTimesData(
+              this.marketDataChartTimes
             );
 
             // Recreate the chart with the updated data
@@ -165,33 +166,33 @@ export class DashboardMarketComponent implements OnInit, AfterViewInit {
           console.error(error);
         });
     } else if (range == '5d') {
-      const interval = '30m';
+      const interval = '15m';
       const options = this.chartApiCallGeneral(range, interval);
 
       axios
         .request(options)
         .then((response) => {
-          this.stocksDataChart = response.data;
+          this.marketDataChart = response.data;
           console.log(response.data);
 
           // Update other chart-related data (prices, times) here as you did in realTimeDataChart()
 
-          this.stocksDataChartPrices =
-            this.stocksDataChart.chart.result[0].indicators.quote[0].close;
+          this.marketDataChartPrices =
+            this.marketDataChart.chart.result[0].indicators.quote[0].close;
 
-          const rawPrices = this.stocksDataChartPrices;
+          const rawPrices = this.marketDataChartPrices;
 
-          this.stocksDataChartPricesRounded = this.stockPricesData(rawPrices);
+          this.marketDataChartPricesRounded = this.marketPricesData(rawPrices);
 
-          this.stocksDataChartTimes =
-            this.stocksDataChart.chart.result[0].timestamp;
+          this.marketDataChartTimes =
+            this.marketDataChart.chart.result[0].timestamp;
 
-          this.stocksDataChartTimesConverted = this.stockTimesData(
-            this.stocksDataChartTimes
+          this.marketDataChartTimesConverted = this.marketTimesData(
+            this.marketDataChartTimes
           );
 
-          this.stocksDataChartTimesConvertedHoursandDays =
-            this.stocksDataChartTimes.map((timeDate: number) => {
+          this.marketDataChartTimesConvertedHoursandDays =
+            this.marketDataChartTimes.map((timeDate: number) => {
               const dateDays = new Date(timeDate * 1000).toLocaleDateString(
                 'en-US'
               );
@@ -219,34 +220,34 @@ export class DashboardMarketComponent implements OnInit, AfterViewInit {
       axios
         .request(options)
         .then((response) => {
-          this.stocksDataChart = response.data;
+          this.marketDataChart = response.data;
           console.log(response.data);
 
           // Update other chart-related data (prices, times) here as you did in realTimeDataChart()
 
-          this.stocksDataChartPrices =
-            this.stocksDataChart.chart.result[0].indicators.quote[0].close;
+          this.marketDataChartPrices =
+            this.marketDataChart.chart.result[0].indicators.quote[0].close;
 
-          const rawPrices = this.stocksDataChartPrices;
+          const rawPrices = this.marketDataChartPrices;
 
-          this.stocksDataChartPricesRounded = this.stockPricesData(rawPrices);
+          this.marketDataChartPricesRounded = this.marketPricesData(rawPrices);
 
-          this.stocksDataChartTimes =
-            this.stocksDataChart.chart.result[0].timestamp;
+          this.marketDataChartTimes =
+            this.marketDataChart.chart.result[0].timestamp;
 
-          this.stocksDataChartTimesConverted = this.stockTimesData(
-            this.stocksDataChartTimes
+          this.marketDataChartTimesConverted = this.marketTimesData(
+            this.marketDataChartTimes
           );
 
-          this.stocksDataChartTimesConvertedHours =
-            this.stocksDataChartTimes.map((timeDate: number) => {
+          this.marketDataChartTimesConvertedHours =
+            this.marketDataChartTimes.map((timeDate: number) => {
               const date = new Date(timeDate * 1000);
               const hours = date.getHours();
               const minutes = date.getMinutes().toString().padStart(2, '0'); // Ensure two digits for minutes
               const formattedTime = `${hours}:${minutes}`;
               return formattedTime;
             });
-          // console.log(this.stocksDataChartTimesConvertedHours);
+          // console.log(this.marketDataChartTimesConvertedHours);
 
           // Recreate the chart with the updated data
           this.createChart();
@@ -265,23 +266,23 @@ export class DashboardMarketComponent implements OnInit, AfterViewInit {
       axios
         .request(options)
         .then((response) => {
-          this.stocksDataChart = response.data;
+          this.marketDataChart = response.data;
           console.log(response.data);
 
           // Update other chart-related data (prices, times) here as you did in realTimeDataChart()
 
-          this.stocksDataChartPrices =
-            this.stocksDataChart.chart.result[0].indicators.adjclose[0].adjclose;
+          this.marketDataChartPrices =
+            this.marketDataChart.chart.result[0].indicators.quote[0].close;
 
-          const rawPrices = this.stocksDataChartPrices;
+          const rawPrices = this.marketDataChartPrices;
 
-          this.stocksDataChartPricesRounded = this.stockPricesData(rawPrices);
+          this.marketDataChartPricesRounded = this.marketPricesData(rawPrices);
 
-          this.stocksDataChartTimes =
-            this.stocksDataChart.chart.result[0].timestamp;
+          this.marketDataChartTimes =
+            this.marketDataChart.chart.result[0].timestamp;
 
-          this.stocksDataChartTimesConverted = this.stockTimesData(
-            this.stocksDataChartTimes
+          this.marketDataChartTimesConverted = this.marketTimesData(
+            this.marketDataChartTimes
           );
 
           // Recreate the chart with the updated data
@@ -296,13 +297,32 @@ export class DashboardMarketComponent implements OnInit, AfterViewInit {
     }
   }
 
+  abbreviateNumber(number: number) {
+    if (number >= 1e12) {
+      // Trillions
+      return (number / 1e12).toFixed(2) + 'T';
+    } else if (number >= 1e9) {
+      // Billions
+      return (number / 1e9).toFixed(2) + 'B';
+    } else if (number >= 1e6) {
+      // Millions
+      return (number / 1e6).toFixed(2) + 'M';
+    } else if (number >= 1e3) {
+      // Thousands
+      return (number / 1e3).toFixed(2) + 'K';
+    } else {
+      // Less than a thousand
+      return number.toString();
+    }
+  }
+
   realTimeData(): void {
     const options = {
       method: 'GET',
-      url: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary',
+      url: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes',
       params: {
-        symbol: 'TSLA',
         region: 'US',
+        symbols: 'AAPL',
       },
       headers: {
         'X-RapidAPI-Key': '362ec0421cmshfba1d04496e3fbbp12c938jsn16f3092359ee',
@@ -313,8 +333,23 @@ export class DashboardMarketComponent implements OnInit, AfterViewInit {
     axios
       .request(options)
       .then((response) => {
-        this.stocksData = response.data; // Store the API data in the component property
+        this.marketData = response.data; // Store the API data in the component property
         console.log(response.data);
+
+        this.marketPriceChange =
+          this.marketData?.quoteResponse.result[0].regularMarketChange.toFixed(
+            2
+          );
+        this.marketPriceChangePercent =
+          this.marketData?.quoteResponse.result[0].regularMarketChangePercent.toFixed(
+            2
+          );
+        this.marketCap = this.abbreviateNumber(
+          this.marketData?.quoteResponse.result[0].marketCap
+        );
+        this.marketVolume = this.abbreviateNumber(
+          this.marketData?.quoteResponse.result[0].regularMarketVolume
+        );
       })
       .catch((error) => {
         console.error(error);
@@ -324,16 +359,12 @@ export class DashboardMarketComponent implements OnInit, AfterViewInit {
   realTimeDataChart(): void {
     const options = {
       method: 'GET',
-      url: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v3/get-chart',
+      url: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/get-charts',
       params: {
+        symbol: 'AAPL',
         interval: '1d',
-        symbol: 'TSLA',
-        range: '1mo',
+        range: '3mo',
         region: 'US',
-        includePrePost: 'false',
-        useYfid: 'true',
-        includeAdjustedClose: 'true',
-        events: 'capitalGain,div,split',
       },
       headers: {
         'X-RapidAPI-Key': '362ec0421cmshfba1d04496e3fbbp12c938jsn16f3092359ee',
@@ -344,24 +375,24 @@ export class DashboardMarketComponent implements OnInit, AfterViewInit {
     axios
       .request(options)
       .then((response) => {
-        this.stocksDataChart = response.data;
+        this.marketDataChart = response.data;
         console.log(response.data);
 
-        this.stocksDataChartPrices =
-          this.stocksDataChart.chart.result[0].indicators.adjclose[0].adjclose;
-        this.stocksDataChartPricesRounded = this.stocksDataChartPrices.map(
+        this.marketDataChartPrices =
+          this.marketDataChart.chart.result[0].indicators.quote[0].close;
+        this.marketDataChartPricesRounded = this.marketDataChartPrices.map(
           (price: number) => price.toFixed(2)
         );
-        // console.log(this.stocksDataChartPricesRounded);
+        // console.log(this.marketDataChartPricesRounded);
 
-        this.stocksDataChartTimes =
-          this.stocksDataChart.chart.result[0].timestamp;
-        // console.log(this.stocksDataChartTimes);
-        this.stocksDataChartTimesConverted = this.stocksDataChartTimes.map(
+        this.marketDataChartTimes =
+          this.marketDataChart.chart.result[0].timestamp;
+        // console.log(this.marketDataChartTimes);
+        this.marketDataChartTimesConverted = this.marketDataChartTimes.map(
           (timeDate: number) =>
             new Date(timeDate * 1000).toLocaleDateString('en-US')
         );
-        // console.log(this.stocksDataChartTimesConverted);
+        // console.log(this.marketDataChartTimesConverted);
         this.createChart();
       })
       .catch((error) => {
@@ -379,11 +410,11 @@ export class DashboardMarketComponent implements OnInit, AfterViewInit {
 
       data: {
         // values on X-Axis
-        labels: this.stocksDataChartTimesConverted,
+        labels: this.marketDataChartTimesConverted,
         datasets: [
           {
             label: 'Price in USD $',
-            data: this.stocksDataChartPricesRounded,
+            data: this.marketDataChartPricesRounded,
             pointBackgroundColor: 'orange',
             borderColor: 'orange', // Border color of the line
             fill: true,

@@ -6,7 +6,7 @@
   color: red;
 }
 
-#stocks {
+#market {
   border-top: 2px solid gray;
   border-bottom: 2px solid gray;
 }
@@ -14,7 +14,7 @@
 .marketColumn {
   text-align: center;
 }
-#stocksChart {
+#marketChart {
   border-top: 2px solid gray;
   padding-top: 5px;
 }
